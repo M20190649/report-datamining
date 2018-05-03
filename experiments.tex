@@ -1,0 +1,94 @@
+\subsection{Experimental setup}
+The experiments were executed in a Mac Book Pro with the following characteristics: 2,6 GHz Intel Core i5, 8 GB 1600 MHz DDR3 memory and 256 GB of storage.
+
+\subsection{Analysis}
+Data set coming from previous steps are used as an input for the calculations in the analysis. These are some of the most relevant features:
+\begin{itemize}
+    \item system\_time - timestamp of the recording
+    \item cell\_loc - event's approximated location
+    \item gps\_loc - event's GPS location, considered as ground truth
+\end{itemize}
+
+The analysis phase is executed with a following steps:
+\begin{enumerate}
+    \item Import input data to pySpark DataFrame from Parquet files
+    \item Generate and display histograms on pairwise distances
+    \item Calculate descriptive statistics on pairwise distances:
+        \begin{itemize}
+            \item min
+            \item max
+            \item sum
+            \item mean
+            \item standard deviation
+        \end{itemize}
+    \item Calculate Euclidean distance measure on trajectories
+    \item Calculate DTW distance measure on trajectories
+    \item Visualize on map
+\end{enumerate}
+
+\subsection{Results}
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.45\textwidth]{images/histogram.png}
+    \caption{Histogram of distances using OpenCelliD cell map}
+    \label{fig:hist_opencell}
+\end{figure}
+
+Looking at the histograms of the pairwise Haversine distances between GPS location points and CDR location point on Figure \ref{fig:hist_opencell}, we can say that for 3G events the majority of the distances fall into the 250-500 meters range. For 2G events, the quality of the event positioning is worse, the majority of events are localized with more than 1000 meters accuracy. Here the distance is maximum two kilometers, due to the threshold we used for joining the CDR data with the cellmap data.
+
+Overall around the half of the CDR events are positioned with less than 500 meters error. This result can change depending on individual customer's mobile usage habits, network characteristics, cell map data source and the customer's geographical position.
+
+From the results in Table \ref{tab:dist_stats}, we can conclude that the overall positioning needs a lot of improvement, as the Euclidean distance is more than 150 kilometers. The reason why this measure is this high is the fact that the square operation in Euclidean distance tends to penalize large distances. The maximum is only around 1.6 kilometers, which does not seem to be extremely high, but this is only because the observations with higher distances are filtered out when joining the CDR and cellmap data sets. 
+The 1.40 meters minimum distance is very low, so it means that for some observations the positioning was very accurate. This would probably happen when the user was very close to the cell tower they connected to. 
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|l|c|}
+        \hline 
+        Euclidean &  \\
+        \hline
+        DTW &  \\
+        \hline
+    \end{tabular}
+    \caption{Descriptive statistics of Haversine distances (in meters)}
+    \label{tab:distances}
+\end{table}
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|l|c|}
+        \hline 
+        count & $27680$ \\
+        \hline
+        min(dist) &  $1.40$\\
+        \hline
+        max(dist) &   $1652.51$\\
+        \hline
+        avg(dist) &  $842.40$\\
+        \hline
+        stddev(dist) &  $456.43$\\
+        \hline
+    \end{tabular}
+    \caption{Descriptive statistics of Haversine distances (in meters)}
+    \label{tab:dist_stats}
+\end{table}
+
+When the user is located between several cell towers, the connection can be passed from one tower to another depending on network traffic fluctuations and other factors. This phenomenon is often referred to as cell tower ping-pong handover. It can however be used for improving positioning and identifying points-of-interest (POIs). As seen in Figure \ref{fig:ping-pong}, the phone connects to a cell tower and to another one and then back again to the previous one. Without knowing the actual GPS position we could better approximate the location of the customer using the ping-pong handover schema.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{images/ping-pong.png}
+    \caption{Cell ping-pong handover problem, GPS points color based on the connected cell tower}
+    \label{fig:ping-pong}
+\end{figure}
+
+This method can be further improved if we take into account the angle of the antennas on the cell towers. If we know which antenna is getting the signal, we can guess the direction of the transmitting cell phone and the signal strength can give an approximation of how far away it is. This method is called cell tower triangulation and can be quite accurate in rural regions with more cell towers. However the information about the angles of the antennas and the signal strength can be outdated or even missing therefore it is not always applicable. In this analysis we did not obtain robust data about the positions of the antennas and the signal strength for each CDR event.
+
+Positioning could be improved by reconstructing trajectories considering the road network of Berlin and the potential speed of the movement instead of simply assigning the the cell location from the cell map data.
+
+We identified three major external factors defining the accuracy of the positioning:
+\begin{itemize}
+    \item individual mobile usage habits affecting the sparsity of CDR data,
+    \item geographical location, as rural and urban areas has different cell size and therefore location defines the accuracy of cell tower localization and
+    \item cellular network characteristics that define the overall data quality and the available attributes in the CDR data-set.
+\end{itemize}
