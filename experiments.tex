@@ -9,10 +9,16 @@ Data set coming from previous steps are used as an input for the calculations in
     \item gps\_loc - event's GPS location, considered as ground truth
 \end{itemize}
 
-The analysis phase is executed with a following steps:
+The analysis phase is executed with a following steps. For each date between 2018-03-12 and 2018-03-16 we do the following:
 \begin{enumerate}
     \item Import input data to pySpark DataFrame from Parquet files
-    \item Generate and display histograms on pairwise distances
+    \item Calculate Euclidean distance measure on trajectories
+    \item Calculate edit distance distance measure on trajectories
+\end{enumerate}
+
+For the whole input data set we also do the following:
+\begin{enumerate}
+   \item Generate and display histograms on pairwise distances
     \item Calculate descriptive statistics on pairwise distances:
         \begin{itemize}
             \item min
@@ -21,52 +27,88 @@ The analysis phase is executed with a following steps:
             \item mean
             \item standard deviation
         \end{itemize}
-    \item Calculate Euclidean distance measure on trajectories
-    \item Calculate DTW distance measure on trajectories
     \item Visualize on map
 \end{enumerate}
-
+    
 \subsection{Results}
-\begin{figure}[h!]
+Looking at the histogram of pairwise spatial distances between the trajectories in Figure\ref{fig:hist} we can say that the majority of the events were positioned with more than 1.5 kilometers uncertainty. Roughly the other half of events were localized with 500 to 1000 meters accuracy, which is still too large for reliable geo-positioning.
+
+We expect that the quality of positioning can be significantly improved by using more accurate and robust information about cell towers.
+
+\begin{figure}[h]
     \centering
-    \includegraphics[width=0.45\textwidth]{images/histogram.png}
-    \caption{Histogram of distances using OpenCelliD cell map}
-    \label{fig:hist_opencell}
+    \includegraphics[width=0.5\textwidth]{images/hist.png}
+    \caption{Histogram of pairwise spatial distance of the point in trajectories}
+    \label{fig:hist}
 \end{figure}
 
-Looking at the histograms of the pairwise Haversine distances between GPS location points and CDR location point on Figure \ref{fig:hist_opencell}, we can say that for 3G events the majority of the distances fall into the 250-500 meters range. For 2G events, the quality of the event positioning is worse, the majority of events are localized with more than 1000 meters accuracy. Here the distance is maximum two kilometers, due to the threshold we used for joining the CDR data with the cellmap data.
 
-Overall around the half of the CDR events are positioned with less than 500 meters error. This result can change depending on individual customer's mobile usage habits, network characteristics, cell map data source and the customer's geographical position.
+This result can change depending on individual customer's mobile usage habits, network characteristics, cell map data source and the customer's geographical position.
 
-From the results in Table \ref{tab:dist_stats}, we can conclude that the overall positioning needs a lot of improvement, as the Euclidean distance is more than 150 kilometers. The reason why this measure is this high is the fact that the square operation in Euclidean distance tends to penalize large distances. The maximum is only around 1.6 kilometers, which does not seem to be extremely high, but this is only because the observations with higher distances are filtered out when joining the CDR and cellmap data sets. 
-The 1.40 meters minimum distance is very low, so it means that for some observations the positioning was very accurate. This would probably happen when the user was very close to the cell tower they connected to. 
+From the results in Table \ref{tab:distances}, we can conclude that the overall positioning needs a lot of improvement. The reason why both measures are this high is the fact that the square operation in Euclidean distance tends to penalize large distances. 
 
+From Table \ref{tab:dist_stats} we see the maximum distance is only around 1.65 kilometers, which does not seem to be extremely high, but this is only because the observations with higher distances are filtered out when joining the CDR and cellmap data sets. 
+The 1.4 meters minimum distance is very low, so it means that for some observations the positioning was very accurate. This would probably happen when the user was very close to the cell tower they connected to. The standard deviation of distances is 456.52 meters, which means that the distribution of distances is fat.
+
+CORRELATION; GRAPH of DISTANCE measures, also save as a notebook
 \begin{table}[h]
     \centering
-    \begin{tabular}{|l|c|}
-        \hline 
-        Euclidean &  \\
+    \begin{tabular}{|l|c|c|}
         \hline
-        DTW &  \\
+        \textbf{Date} & \textbf{Euclidean distance} & \textbf{Edit distance}\\
+        \hline 
+        2018-03-01 & ??? & ?? \\
+        \hline 
+        2018-03-02 & ??? & ?? \\
+        \hline 
+        2018-03-03 & ??? & ?? \\
+        \hline 
+        2018-03-04 & ??? & ?? \\
+        \hline 
+        2018-03-05 & ??? & ?? \\
+        \hline 
+        2018-03-06 & ??? & ?? \\
+        \hline 
+        2018-03-07 & ??? & ?? \\
+        \hline 
+        2018-03-08 & ??? & ?? \\
+        \hline 
+        2018-03-09 & ??? & ?? \\
+        \hline 
+        2018-03-10 & ??? & ?? \\
+        \hline 
+        2018-03-11 & ??? & ?? \\
+        \hline 
+        2018-03-12 & ??? & ?? \\
+        \hline 
+        2018-03-13 & ??? & ?? \\
+        \hline 
+        2018-03-14 & ??? & ?? \\
+        \hline 
+        2018-03-15 & ??? & ?? \\
+        \hline 
+        2018-03-16 & ??? & ?? \\
         \hline
     \end{tabular}
-    \caption{Descriptive statistics of Haversine distances (in meters)}
+    \caption{Distance measures during the studied period}
     \label{tab:distances}
 \end{table}
 
 \begin{table}[h]
     \centering
     \begin{tabular}{|l|c|}
+        \hline
+        \textbf{Statistic} & \textbf{Value} \\
         \hline 
-        count & $27680$ \\
+        count & $27398$ \\
         \hline
         min(dist) &  $1.40$\\
         \hline
         max(dist) &   $1652.51$\\
         \hline
-        avg(dist) &  $842.40$\\
+        avg(dist) &  $839.04$\\
         \hline
-        stddev(dist) &  $456.43$\\
+        stddev(dist) &  $456.52$\\
         \hline
     \end{tabular}
     \caption{Descriptive statistics of Haversine distances (in meters)}

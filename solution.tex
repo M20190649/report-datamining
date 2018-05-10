@@ -42,40 +42,74 @@ The Euclidean distance formula is implemented as presented in Algorithm \ref{alg
 \end{algorithmic}
 \end{algorithm}
 
-The dynamic time warping distance is calculated similarly to the formulation given in \cite{traj-sim-rev}:
-    \[
-        D(T,\Tilde{T}) =
-        \begin{cases}
-            0, \text{if } n=m=0 \\
-            \infty,\text{if }  n=0 \text{ or } m=0 \\
-            d(h(T), h(\Tilde{T})) + \min 
-            \begin{cases}  
-                D(r(T),\Tilde{T}) \\
-                D(T,r(\Tilde{T})) \\
-                D(r(T),r(\Tilde{T})) 
-            \end{cases}
-        \end{cases}
-    \]
-where $h(.)$ returns the first point in the trajectory and $r(.)$ returns all except the first one.
+We define the edit distance $d_m,n$ for two sequences $a = a_1\ldots a_n$ and $b = b_1\ldots b_m$ similarly to Levenshtein's formula \cite{edit_dist}:
+\[
+\begin{aligned}
+\quad {\text{for}}\;1\leq i\leq m \\
+d_{{i,0}}=\sum _{{k=1}}^{{i}}w_{{\mathrm  {del}}}(b_{{k}}) \\
+\quad {\text{for}}\;1\leq j\leq n & \\
+d_{{0,j}}=\sum _{{k=1}}^{{j}}w_{{\mathrm  {ins}}}(a_{{k}}) \\
+\quad {\text{for}}\;1\leq i\leq m,1\leq j\leq n \\
+d_{{i,j}}={\begin{cases}d_{{i-1,j-1}}&{\text{for}}\;a_{{j}}=b_{{i}}\\
+\min {\begin{cases}d_{{i-1,j}}+w_{{\mathrm  {del}}}(b_{{i}})\\d_{{i,j-1}}+w_{{\mathrm  {ins}}}(a_{{j}})\\d_{{i-1,j-1}}+w_{{\mathrm  {sub}}}(a_{{j}},b_{{i}})\end{cases}}&{\text{for}}\;a_{{j}}\neq b_{{i}}\end{cases}} 
+\end{aligned}
+\]
 
+In this research we want to determine distance of spatial trajectories therefore the cost function of the edit distance algorithm needs to be modified to incorporate the spatial distribution of trajectories. As an extension to traditional edit distance measure, we apply the cost functions from \cite{spatial_edit} as follows:
+\begin{multline*}
+w_{{\mathrm  {del}}} (b_{{k}}) = \biggl(\biggl[\frac{\sum \limits_{i=1}^n x_{i}^{b}}{n}-\frac{\sum \limits_{i=1, i \neq k}^n x_{i}^{b}}{n-1}\biggr]^2 \\+ \biggl[ \frac{\sum \limits_{i=1}^n y_{i}^{b}}{n}-\frac{\sum \limits_{i=1, i \neq k}^n y_{i}^{b}}{n-1}\biggr]^2\biggr)^{1/2}
+\end{multline*}
+\begin{multline*}
+w_{{\mathrm  {ins}}} (a_{{j}}) = \biggl(\biggl[\frac{\sum \limits_{i=1}^n x_{i}^{b}}{n}-\frac{\sum \limits_{i=1}^n x_{i}^{b} + x_{j}^{a}}{n+1}\biggr]^2 \\ + \biggl[ \frac{\sum \limits_{i=1}^n y_{i}^{b}}{n}-\frac{\sum \limits_{i=1}^n y_{i}^{b} + y_{j}^{a}}{n+1}\biggr]^2\biggr)^{1/2}
+\end{multline*}
+\begin{multline*}
+w_{{\mathrm  {sub}}} (a_{{j}}, b_{{k}}) = \biggl( \biggl[\frac{\sum \limits_{i=1}^n x_{i}^{b}}{n}-\frac{\sum \limits_{i=1, i \neq k}^n x_{i}^{b} + x_{j}^{a}}{n}\biggr]^2\\ + \biggl[\frac{\sum \limits_{i=1}^n y_{i}^{b}}{n}-\frac{\sum \limits_{i=1, i \neq k}^n y_{i}^{b} + y_{j}^{a}}{n}\biggr]^2 \biggr)^{1/2}
+\end{multline*}
+where $b_{{k}}$ and $a_{{j}}$ are points given as a pair of coordinates $(x_{{k}}^{b}, y_{{k}}^{b})$ and $(x_{{j}}^{a}, y_{{j}}^{a})$, respectively.
+
+In CDR data each cell tower is referenced by its geographic coordinates, most commonly in the form of latitude and longitude. Therefore, traditional similarity measures in Euclidean space are not sufficient. The latitude, longitude values are need to be converted to Cartesian coordinates. In this research the EPSG:31468\footnote{For more details visit \url{https://epsg.io/31468}.} coordinate system is used, which can be used in some states of Germany, namely Bayern, Berlin, Niedersachsen and Schleswig-Holstein.
+
+The edit distance formula is implemented as presented in Algorithm \ref{algo:edit}.
 
 \begin{algorithm}
 \begin{algorithmic}
-\caption{DTW distance function on trajectories} \label{algo:euclidean}
-\Function{dtwDist}{Traj tReal, Traj tApprox}
-    \If{(tReal is None) and (tApprox is None)} 
-        \State\Return 0
-    \EndIf
-    \If{(tReal is None) or (tApprox is None)}
-        \State\Return inf
-    \EndIf
+\caption{Edit distance function on trajectories} \label{algo:edit}
+\Function{euditDist}{Traj tReal, Traj tApprox}
+\State n = len(tReal)
+\State m = len(tApprox) 
+\State dist = matrix(m, n)
+\If {n == 0}
+    \State sum = 0
+    \For{i \textbf{in} 0 to m}
+        \State sum = sum + $w_{del}$(b, i)
+    \EndFor
+    \Return sum
+\EndIf
 
-    \Return haversine(tReal.head(), tApprox.head()) + \State min(dtwDist(tReal, rest(tApprox)),     
-    \State dtwDist(rest(tReal), tApprox), 
-    \State dtwDist(rest(dReal), rest(dApprox)))
+\If {m == 0}
+    \State sum = 0
+    \For{j \textbf{in} 0 to n}
+        \State sum = sum + $w_{ins}$(a, j)
+    \EndFor
+    \Return sum
+\EndIf
+
+\If {n > 0 and m > 0}
+   \For{i \textbf{in} 0 to m}
+        \For{j \textbf{in} 0 to n}
+            \If {b[i] == a[j]}
+                \State dist[i, j] = dist[i - 1, j - 1]
+            \Else
+                \State dist[i, j] = \textbf{min}(dist[i - 1, j] + $w_{del}$(b, i), dist[i, j - 1] + $w_{ins}$(b, a, j), dist[i - 1, j - 1] + $w_{sub}$(b, a, i, j))
+            \EndIf
+        \EndFor
+    \EndFor
+    \Return dist[m - 1, n - 1]
+\EndIf
 \EndFunction
 \end{algorithmic}
 \end{algorithm}
+
 
 Given a set of distance observations with size $n$, we consider $\{d_{1}, d_{2}, ..., d_{n}\}$ as $n$ independent identically distributed (i.i.d) random variables, each corresponding to one randomly selected observation and having the distribution of the population. Then we can calculate the following descriptive statistics for the sample:
 \begin{itemize}

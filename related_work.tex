@@ -18,7 +18,7 @@ A trajectory $T$\nomenclature{$T$}{Trajectory given as  time-stamped sequence of
 where $\mathcal{M}$\nomenclature{$\mathcal{M}$}{A set of possible trajectories.} is the set of possible trajectories.
 \end{definition}
 
-\section{Trajectory similarity}
+\subsection{Trajectory similarity}
 If we consider trajectories as a sequence of points, the distance of two trajectories can be considered as an aggregate of distances between the points of the compared trajectories. The way of aggregation can determine the computation time, accuracy and sensitivity of the distance measure.
 
 According to Magdy et al. (\cite{traj-sim-rev}) the existing trajectory distance measures can be classified into two classes: 
@@ -33,7 +33,10 @@ Although Euclidean distance relies on the fact that time series and trajectories
 
 On the other hand, DTW is a non-metric measure that provides more flexibility in terms of the length and sampling rate of the trajectories and takes the time-stamps into account. However it is more I/O and time consuming. For low quality GPS data the authors propose longest common sub-sequence (LCSS) method that is also used as a string similarity metric.
 
-Most of the above mentioned measures depend on the definition of spatial distance between two points. One of the most common spatial distance between two points can be given with the Haversine formula \cite{haversine}, which  defines the great-circle distance in kilometers between two points on a sphere given their longitudes and latitudes.
+Traditional edit distance measure and its improved versions are also used for defining distance between trajectories. 
+The edit distance measure is in general applied for string matching and correction. The standard edit distance calculates the minimum number of operations required to switch one string to another, thus can be applied for matching series of cell IDs in CDRs. Edit distance can handle trajectories with different lengths and can be extended to incorporate spatial and temporal characteristics of the trajectories. \cite{spatial_edit}
+
+Most of the distance measures on trajectories depend on the definition of spatial distance between two points. One of the most common spatial distance between two points can be given with the Haversine formula \cite{haversine}, which  defines the great-circle distance in kilometers between two points on a sphere given their longitudes and latitudes.
 
 \begin{definition}
 A for any two points on a sphere, the Haversine formula determines the spatial distance between the two points denoted with $d$\nomenclature{$d$}{Spatial distance between two points.} according to \cite{haversine}:
