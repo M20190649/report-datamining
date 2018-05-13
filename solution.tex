@@ -1,10 +1,10 @@
 As the users tend to move while using their phones, the generated CDR observations have semantics of trajectories. CDR data points can be grouped as trajectories so that the characteristics of trajectories and the result of previous research already conducted in this field can be utilized for achieving more accurate positioning.
 
-We compare the ground truth GPS trajectories to trajectories of CDR events for the same time window in a distributed fashion as shown in Figure \ref{fig:problem}. 
+We compare the ground truth GPS trajectories to trajectories of CDR events for the same time window as shown in Figure \ref{fig:problem}. 
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.45\textwidth]{images/problem.png}
-    \caption{Problem illustration}
+    \caption{Schematic illustration of the research problem}
     \label{fig:problem}
 \end{figure}
 
@@ -25,6 +25,8 @@ the triangle inequality is also satisfied, $D$ is a metric.
 The \textit{Euclidean distance} (or inverse similarity) measure between two trajectories is used in this analysis:
 \[D(T,\Tilde{T}) = \sqrt{\sum_{i=1}^{n} (d(P_{i},\Tilde{P_{i}}))^{2}}\]
 
+where $d((P_{i},\Tilde{P_{i}})$ refers to the spatial distance between two points given with the Haversine formula.
+
 The Euclidean distance formula is implemented as presented in Algorithm \ref{algo:euclidean}.
 
 \begin{algorithm}
@@ -42,16 +44,16 @@ The Euclidean distance formula is implemented as presented in Algorithm \ref{alg
 \end{algorithmic}
 \end{algorithm}
 
-We define the edit distance $d_m,n$ for two sequences $a = a_1\ldots a_n$ and $b = b_1\ldots b_m$ similarly to Levenshtein's formula \cite{edit_dist}:
+We define the edit distance $D_{m,n}$ for two sequences $a = a_1\ldots a_n$ and $b = b_1\ldots b_m$ similarly to Levenshtein's formula \cite{edit_dist}:
 \[
 \begin{aligned}
 \quad {\text{for}}\;1\leq i\leq m \\
-d_{{i,0}}=\sum _{{k=1}}^{{i}}w_{{\mathrm  {del}}}(b_{{k}}) \\
+D_{{i,0}}=\sum _{{k=1}}^{{i}}w_{{\mathrm  {del}}}(b_{{k}}) \\
 \quad {\text{for}}\;1\leq j\leq n & \\
-d_{{0,j}}=\sum _{{k=1}}^{{j}}w_{{\mathrm  {ins}}}(a_{{k}}) \\
+D_{{0,j}}=\sum _{{k=1}}^{{j}}w_{{\mathrm  {ins}}}(a_{{k}}) \\
 \quad {\text{for}}\;1\leq i\leq m,1\leq j\leq n \\
-d_{{i,j}}={\begin{cases}d_{{i-1,j-1}}&{\text{for}}\;a_{{j}}=b_{{i}}\\
-\min {\begin{cases}d_{{i-1,j}}+w_{{\mathrm  {del}}}(b_{{i}})\\d_{{i,j-1}}+w_{{\mathrm  {ins}}}(a_{{j}})\\d_{{i-1,j-1}}+w_{{\mathrm  {sub}}}(a_{{j}},b_{{i}})\end{cases}}&{\text{for}}\;a_{{j}}\neq b_{{i}}\end{cases}} 
+D_{{i,j}}={\begin{cases}D_{{i-1,j-1}}&{\text{for}}\;a_{{j}}=b_{{i}}\\
+\min {\begin{cases}D_{{i-1,j}}+w_{{\mathrm  {del}}}(b_{{i}})\\D_{{i,j-1}}+w_{{\mathrm  {ins}}}(a_{{j}})\\D_{{i-1,j-1}}+w_{{\mathrm  {sub}}}(a_{{j}},b_{{i}})\end{cases}}&{\text{for}}\;a_{{j}}\neq b_{{i}}\end{cases}} 
 \end{aligned}
 \]
 
