@@ -1,24 +1,67 @@
 In this section we review the related work with respect to relevant frameworks and concepts used in this paper for CDR based customer positioning and its implementation.
 
+\subsection{Human mobility tracking}
+Tracking of human movement is a complex problem involving many scientific fields from geographic information science to data mining. 
+
+This field has gained large momentum over the last decade as more and more people carry around devices that provide location information. The analysis of such information may help us better understand how society works. There are endless applications of human mobility tracking and analysis, such as transportation and urban planning \cite{mobility-transport, mobility-transport2, mobility-urban}, event detection \cite{mobility-event, mobility-bluetooth}, anomaly detection \cite{mobility-anomaly}, epidemic control \cite{mobility-epidemic}, location-aware marketing \cite{mobility-marketing} and smart retail \cite{mobility-retail, mobility-retail2}.
+
+Human mobility data can be captured in various ways. For instance a payment with a credit card \cite{mobility-card}, a taxi ride \cite{mobility-taxi, mobility-taxi2}, a call with a mobile phone \cite{mobility-cdr, mobility-cdr2, mobility-cdr3, mobility-cdr4}, carrying a location-aware device \cite{mobility-gps, mobility-wearable} or even being active on a social media platform \cite{mobility-twitter} allow the inference of a person's current geographic location. The most convenient way to collect high-resolution mobility of individuals and capture entire social systems is through a wide variety of sensors available on modern smart-phones \cite{mobility-phone}, including GPS receiver, antenna for cellular and wireless networks such as Bluetooth \cite{mobility-bluetooth} and Wi-Fi \cite{mobility-wifi}, which is mainly used for indoor positioning.  
+
+The characteristics of the collected data depends heavily on the data source. Mobility data collected with a device equipped with a GPS receiver is usually the preferred way, as other sources result in temporally and spatially sparse data. The reason for this is that data points are only generated upon a certain action of the user i.e. phone call, credit card usage or action of the device, such as connection to WiFi network or communication with cell towers.
+
+Combining different data sources of mobility data can improve the data quality. In \cite{wifi-gps} researchers combined GPS observations and WiFi data to boost the temporal resolution of the collected location information.
+
+It has been historically difficult to track human mobility, making it de-facto private. Nowadays information technologies have challenged these informal protection mechanisms and the collected data magnifies the uniqueness of individuals. 
+
+The captured human mobility data is considered as highly sensitive information as it contains the approximate location of individuals and can be used to reconstruct individuals' movements across space and time. As our every day activities are being captured by many different sources each individual have a very unique digital footprint. It has been shown that in an anonymized CDR data set where the location of an individual is specified hourly and is approximated by the connected cell tower's location, four spatio-temporal points are enough to uniquely identify 95\% of the individuals. \cite{privacy-mobility}
+
+Following the technological advancements in human mobility tracking, there are new laws and regulations being introduced to protect people's privacy.
+
+Due to the fact that people tend to move while generating location data, mobility data has the semantics of trajectories. Data points can be grouped as trajectories so that the characteristics of trajectories and the result of previous research already conducted in this field can be utilized for achieving more accurate This way we learn more about the location of the user by considering their movement history as trajectory instead of just independent collection of points. 
+
 \subsection{Trajectory mining}
+Trajectory mining has been widely researched during the last decades. Since trajectories represent a moving object's location history, there are plenty of use cases where trajectory mining can be successfully applied.
+
+For instance, it can be applied to user-generated spatial data. In the last years many researcher has concentrated on this domain due the fact that most mobile phones are now able to track GPS, there is more and more data available for data mining. 
+
+In practice a trajectory is rarely continuous due to the limited sampling capability, therefore one reasonable approach is to consider trajectories as a sequence of points.
+
+\begin{definition}
+A geographical point $P(lat,lon)$ can be defined as a pair of latitude and longitude values representing a geographical location.
+\end{definition}
+
+\begin{definition}
+A trajectory $T$ with length $n$ is defined as a time-stamped sequence of its consecutive points: \[T={(t_{1},P_{1}), (t_{2},P_{2}), .. (t_{n},P_{n})}, T \in M\]
+where $\mathcal{M}$ is the set of possible trajectories.
+\end{definition}
+
+A trajectory reflects the motion history of a moving object. Different problems require tracking location of different moving objects, such as animals, vehicles, humans or hurricanes. These are all considered trajectories, however they have different characteristics that need to be accounted for when extracting information from the data set.
+
+There are several methods for mining trajectories, which can be categorized as primary or secondary methods according to \cite{traj-mining-overview}. Primary methods focus on categorization of the trajectories based on their properties, such as trajectory clustering and trajectory classification. The objective of secondary mining techniques - such as pattern mining, outlier detection, and prediction - is to analyze the spatial, temporal, or spatio-temporal behaviour of the individual trajectories.
+
+Trajectory clustering is used to group trajectories together that are more similar to each other than to other trajectories. State-of-the-art clustering algorithms for trajectories are extensions of standard clustering algorithms through a proper definition of similarity (or distance) functions. Detection of social ties between individuals and community discovery are common research problems that can utilize trajectory clustering methods. \cite{traj-mining-overview} 
+Classification of trajectories can be used to determine a rule to assign objects into pre-defined classes, such as biking, walking or driving. Similarly to traditional classification, trajectory classification is a supervised learning algorithm, which depends on a set of pre-defined labels or classes and training data containing labelled observations. For instance labelling trajectories from a large set with their transportation mode, given a small set of manually labeled trajectories is a typical use case for trajectory classification. \cite{traj-mining-overview}
+
+Stay points in a trajectory are geographic regions were an individual has spent a considerable time on within a certain proximity. They can refer to a restaurant, home location, workplace, gym or store. Stay points can be defined in terms of both spatial and temporal features. For instance, if an individual stays over 10 minutes within a region of 100 meters it can be considered as a stay point. This approach to stay point detection is essentially clustering the points of the trajectory based on their relative time difference and distance. In this sense a stay point is a high level representation of a cluster of points thus can be represented as the centroid of the cluster.  The extracted stay points can be clustered into points of interest, which are frequently visited stay points. Points of interests can be calculated for each individual and also for the whole population. \cite{mobility-cdr4, traj-datamining-overview}
+
+Trajectory classification and POI detection can be utilized to extract additional features and enrich trajectories with semantic information so that the interpretations of movements can be better represented. This rich trajectory data can then be basis of further research in semantic trajectory data analysis, which has received significant attention in the recent years. \cite{traj-semantic, traj-semantic2}
+
+
+\subsubsection{Distance and similarity}
 %http://crpit.com/confpapers/CRPITV137Wang.pdf
-For more accurate customer localization the individual observations of user location can be grouped as set of trajectories. In this way we learn more about the location of the user by considering the semantics of trajectories and the related work done in the field of trajectory mining. Trajectory similarity is a key concept used in this paper for evaluating the quality of event positioning.
-
-Trajectory mining has been widely researched during the last decades. Since trajectories represent a moving object's location history, there are plenty of use cases where trajectory mining can be successfully applied.  Due the fact that most mobile phones are now able to track GPS, there is more and more data available for this domain of data mining. There is however still no consensus on what dissimilarity or distance measure to use when comparing trajectories.
-
-A trajectory reflects the motion history of a moving object. In practice trajectory is not continuous due to the limited sampling capability, therefore one reasonable approach is to consider trajectories as a sequence of points.
-
-\newdef{definition}{Definition}
-\begin{definition}
-A point $P(x,y)$\nomenclature{$P(x,y)$}{A point given as a pair of latitude and longitude, representing a geographical location.}can be defined as a pair of latitude $y$ and longitude $x$ values representing a geographical location.
-\end{definition}
+Similarly to the formulation in \cite{encyclopedia} and \cite{distance-def}  distance measure on trajectories can be given such as:
 
 \begin{definition}
-A trajectory $T$\nomenclature{$T$}{Trajectory given as  time-stamped sequence of points with length $n$.} with length $n$ is defined as a time-stamped sequence of its consecutive points: \[T={(t_{1},P_{1}), (t_{2},P_{2}), .. (t_{n},P_{n}}), T \in M\]
-where $\mathcal{M}$\nomenclature{$\mathcal{M}$}{A set of possible trajectories.} is the set of possible trajectories.
+Let $\mathcal{M}$ be a set of trajectories. A function $D :\mathcal{M} \times \mathcal{M} \rightarrow \mathcal{R}$ is called a dissimilarity (distance) on $\mathcal{M}$ if for all $T_{1}, T_{2} \in \mathcal{M}$: 
+\begin{itemize}
+    \item $D(T_{1},T_{2}) \geqslant 0$
+    \item $D(T_{1},T_{2}) = d(T_{2},T_{2})$
+    \item $D(T_{1},T_{1}) = 0$
+\end{itemize}
+If all of these conditions are satisfied and $D(T_{1}, T_{2}) = 0 \Rightarrow  T_{1} = T_{2} $ is considered to be a symmetric. If
+the triangle inequality is also satisfied, $D$ is a metric.
 \end{definition}
 
-\subsection{Trajectory similarity}
 If we consider trajectories as a sequence of points, the distance of two trajectories can be considered as an aggregate of distances between the points of the compared trajectories. The way of aggregation can determine the computation time, accuracy and sensitivity of the distance measure.
 
 According to Magdy et al. (\cite{traj-sim-rev}) the existing trajectory distance measures can be classified into two classes: 
@@ -36,10 +79,10 @@ On the other hand, DTW is a non-metric measure that provides more flexibility in
 Traditional edit distance measure and its improved versions are also used for defining distance between trajectories. 
 The edit distance measure is in general applied for string matching and correction. The standard edit distance calculates the minimum number of operations required to switch one string to another, thus can be applied for matching series of cell IDs in CDRs. Edit distance can handle trajectories with different lengths and can be extended to incorporate spatial and temporal characteristics of the trajectories. \cite{spatial_edit}
 
-Most of the distance measures on trajectories depend on the definition of spatial distance between two points. One of the most common spatial distance between two points can be given with the Haversine formula \cite{haversine}, which  defines the great-circle distance in kilometers between two points on a sphere given their longitudes and latitudes.
+Many of the above mentioned measures depend on the definition of spatial distance between two points. One of the most common spatial distance between two points can be given with the Haversine formula as defined in the previous section.
 
 \begin{definition}
-A for any two points on a sphere, the Haversine formula determines the spatial distance between the two points denoted with $d$\nomenclature{$d$}{Spatial distance between two points.} according to \cite{haversine}:
+A for any two points on a sphere, the Haversine formula determines the spatial distance between the two points denoted with $d$ according to \cite{haversine}:
     \[\Delta_{x} = x_{2} - x_{1}\]
     \[\Delta_{y} = y_{2} - y_{1}\]
     \[a = (\sin(\Delta_{y}/2))^2 + \cos{(y_{1})} * \cos{(y_{2})} * (\sin{(\Delta_{x}/2)})^2 \]

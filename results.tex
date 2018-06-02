@@ -13,9 +13,9 @@ This result can change depending on individual customer's mobile usage habits, n
 
 As seen in Table \ref{tab:dist_stats}, there are only 2780 CDR observations, which were successfully positioned out of 37062 observations between 2018-03-12 and 2018-03-16. This 7.5\% positioning ratio is lower than expected and indicates that most of the cell IDs that were recorded by the application can not be found in the cellmap. This is likely to be because of the fact that the cellmap's quality is poor.
 
-We see the maximum distance is more than 8 kilometers, which seems to be quite high given we only had observations within the city of Berlin, where we did not expect distances larger than 2-3 kilometers because the cells are usually smaller in the urban area \cite{cell-site}. This can also support the argument that the quality of the cellmap is poor.
+We see the maximum distance is more than 8 kilometers, which seems to be high given we only had observations within the city of Berlin, where we did not expect distances larger than 2-3 kilometers because the cells are usually smaller in the urban area \cite{cell-site}. This can also support the argument that the quality of the cellmap is poor.
 
-The average distance is around 2 kilometers, with a very high (2 kilometers) standard deviation. Therefore we can say that the distances are very volatile, which can be because of the fact that the user moves around with the test phone and when it is closer to the cell site the distance is very low and as the user moves farther away the distance becomes larger.
+The average distance is around 2 kilometers, with a high (2 kilometers) standard deviation. Therefore we can say that the distances are volatile, which can be because of the fact that the user moves around with the test phone and when it is closer to the cell site the distance is low and as the user moves farther away the distance becomes larger.
 
 From Figure \ref{fig:traj}, we can conclude that the overall positioning needs a lot of improvement. 
 
@@ -27,7 +27,7 @@ From Figure \ref{fig:traj}, we can conclude that the overall positioning needs a
 \end{figure}
 
 Euclidean distance tends to penalize large distances thus the high values seen in Table \ref{tab:distances}. The absolute values of the two types of distances cannot be compared, as their measure is different. The Euclidean distance grows with the number of events, but the edit distance does not. 
-The Euclidean distance is measured in meters, therefore it is simple to interpret and scales well with the number of observations. It is also very easy to implement with pySpark DataFrames. In contrast with this, the result of edit distance algorithm has not direct interpretation and its time complexity and the nature of the algorithm makes it significantly slower. Due to the fact that it is a dynamic programming problem, it is also not straightforward to implement as pySpark DataFrame operations.
+The Euclidean distance is measured in meters, therefore it is simple to interpret and scales well with the number of observations. It is also easy to implement with pySpark DataFrames. In contrast with this, the result of edit distance algorithm has not direct interpretation and its time complexity and the nature of the algorithm makes it significantly slower. Due to the fact that it is a dynamic programming problem, it is also not straightforward to implement as pySpark DataFrame operations.
 
 \begin{table}[h]
     \centering
@@ -81,7 +81,7 @@ When the user is located between several cell towers, the connection can be pass
     \label{fig:ping-pong}
 \end{figure}
 
-This method can be further improved if we take into account the angle of the antennas on the cell towers. If we know which antenna is getting the signal, we can guess the direction of the transmitting cell phone and the signal strength can give an approximation of how far away it is. This method is called cell tower triangulation and can be quite accurate in urban regions with more cell towers. However the information about the angles of the antennas and the signal strength can be outdated or even missing therefore it is not always applicable. In this analysis we did not obtain robust data about the positions of the antennas and the signal strength for each CDR event.
+This method can be further improved if we take into account the angle of the antennas on the cell towers. If we know which antenna is getting the signal, we can guess the direction of the transmitting cell phone and the signal strength can give an approximation of how far away it is. This method is called cell tower triangulation and can be more accurate in urban regions with more cell towers. However the information about the angles of the antennas and the signal strength can be outdated or even missing therefore it is not always applicable. In this analysis we did not obtain robust data about the positions of the antennas and the signal strength for each CDR event.
 
 Positioning could be improved by reconstructing trajectories considering the road network of Berlin and the potential speed of the movement instead of simply assigning the the cell location from the cell map data.
 

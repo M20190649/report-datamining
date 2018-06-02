@@ -10,7 +10,8 @@ We compare the ground truth GPS trajectories to trajectories of CDR events for t
 
 To evaluate cellular network event based customer localization we calculate the Euclidean distance and the edit distance along with several statistics of the pairwise distances between ground truth GPS trajectories and mobile network event trajectories. The Haversine distance is used to define the spatial distance between points. In the mobile network event trajectory, the location information is obtained from cell map data set.
 
-Similarly to the formulation in \cite{encyclopedia} and \cite{distance-def} we define distance measure on trajectories, such as:
+
+Distance measure on trajectories is defined similarly to \cite{encyclopedia, distance-def}:
 \begin{definition}
 Let $\mathcal{M}$ be a set of trajectories. A function $D :\mathcal{M} \times \mathcal{M} \rightarrow \mathcal{R}$ \nomenclature{$D$}{Distance measure defined on a set of trajectories.} is called a dissimilarity (distance) on $\mathcal{M}$ if for all $T_{1}, T_{2} \in \mathcal{M}$: 
 \begin{itemize}
@@ -128,7 +129,7 @@ Note that $\{d_{1}, d_{2}, ..., d_{n}\}$ are the spatial distances between pairs
 
 For calculation of the descriptive statistics and the Euclidean distance the number of CDR and GPS observations need to match, which by the design of the data collection is guaranteed.
 
-In this paper we do not attempt to reconstruct trajectories from CDR data considering the road network of Berlin. Instead we consider the sequence of positioned mobile network events together with the GPS observation and we try to determine the distance of the two trajectories based on the distances of individual pairs of points.
+In this paper we do not attempt to reconstruct trajectories from CDR data considering the road network of Berlin. Instead we consider the sequence of positioned mobile network events together with the GPS observation and we determine the distance of the two trajectories based on the distances of individual pairs of points.
 
 
 
